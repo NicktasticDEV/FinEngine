@@ -1,2 +1,3 @@
 # FinEngine
-A Wii game engine
+
+A Work in Progress Game Engine written in C++.
