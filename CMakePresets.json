@@ -1,0 +1,66 @@
+{
+    "version": 8,
+    "configurePresets": [
+        {
+            "name": "macos-clang-arm64-base",
+            "hidden": true,
+            "description": "Base preset for macOS ARM64 using system Clang",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "/usr/bin/clang",
+                "CMAKE_CXX_COMPILER": "/usr/bin/clang++"
+            }
+        },
+        {
+            "name": "macos-clang-arm64-Debug-config",
+            "displayName": "macOS Clang ARM64 (Debug)",
+            "inherits": ["macos-clang-arm64-base"],
+            "description": "Configure for macOS on ARM64 in Debug mode using Clang",
+            "binaryDir": "${sourceDir}/out/build/macos-clang-arm64/Debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/macos-clang-arm64/Debug"
+            }
+        },
+        {
+            "name": "macos-clang-arm64-Release-config",
+            "displayName": "macOS Clang ARM64 (Release)",
+            "inherits": ["macos-clang-arm64-base"],
+            "description": "Configure for macOS on ARM64 in Release mode using Clang",
+            "binaryDir": "${sourceDir}/out/build/macos-clang-arm64/Release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/macos-clang-arm64/Release"
+            }
+        }
+    ],
+
+    "buildPresets": [
+        {
+            "name": "macos-clang-arm64-Debug",
+            "configurePreset": "macos-clang-arm64-Debug-config",
+            "displayName": "Build macOS Clang ARM64 Debug",
+            "description": "Build for macOS on ARM64 in Debug mode using Clang"
+        },
+        {
+            "name": "macos-clang-arm64-Release",
+            "configurePreset": "macos-clang-arm64-Release-config",
+            "displayName": "Build macOS Clang ARM64 Release",
+            "description": "Build for macOS on ARM64 in Release mode using Clang"
+        },
+        {
+            "name": "macos-clang-arm64-Debug-install",
+            "configurePreset": "macos-clang-arm64-Debug-config",
+            "displayName": "Install macOS Clang ARM64 Debug",
+            "description": "Build and install (cmake --install) Debug artifacts",
+            "targets": ["install"]
+        },
+        {
+            "name": "macos-clang-arm64-Release-install",
+            "configurePreset": "macos-clang-arm64-Release-config",
+            "displayName": "Install macOS Clang ARM64 Release",
+            "description": "Build and install (cmake --install) Release artifacts",
+            "targets": ["install"]
+        }
+    ]
+}
