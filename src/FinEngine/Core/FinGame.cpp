@@ -21,7 +21,11 @@ namespace FinEngine {
         // State update
         while (isRunning) {
 
-            GFX_PollEvents();
+            // If the window requests close, exit the game loop
+            if (GFX_ShouldClose()) {
+                printf("FinGame: Window close requested\n");
+                Exit();
+            }
 
             // State init
             if (nextState)

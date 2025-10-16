@@ -1,8 +1,10 @@
 #pragma once
 
+#include "FinEngine/FinEngineAPI.h"
+
 namespace FinEngine {
 
-    class FinState {
+    class FINENGINE_API FinState {
         public:
             virtual void init() = 0;
             virtual void update() = 0;

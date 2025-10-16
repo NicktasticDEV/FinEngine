@@ -13,6 +13,9 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(FinEngine_SRC
     "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Core/FinGame.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Graphics/Graphics_Desktop.cpp"
+
+    # External Libraries
+    "${CMAKE_CURRENT_SOURCE_DIR}/external/glad/src/glad.c"
 )
 
 set(FinEngine_INCLUDE
@@ -27,7 +30,17 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC 
         $<BUILD_INTERFACE:${FinEngine_INCLUDE}>
         $<INSTALL_INTERFACE:include>
+    PRIVATE 
+        "${CMAKE_CURRENT_SOURCE_DIR}/external/glad/include"
 )
+
+target_compile_definitions(${PROJECT_NAME}
+    PRIVATE FINENGINE_BUILD_DLL
+)
+
+# On Windows, export all symbols by default so consumers can link without
+# needing explicit __declspec(dllexport) annotations.
+set_target_properties(${PROJECT_NAME} PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 # ==========================================
 # Dependencies
@@ -49,9 +62,9 @@ CPMAddPackage(
 
 # Add dependency to the target
 target_link_libraries(${PROJECT_NAME} 
-    PRIVATE 
-    glfw
-    OpenGL::GL
+    PRIVATE
+        glfw
+        OpenGL::GL
 )
 
 # ==========================================

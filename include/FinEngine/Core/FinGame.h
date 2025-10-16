@@ -1,9 +1,10 @@
 #pragma once
 #include "FinState.h"
+#include "FinEngine/FinEngineAPI.h"
 
 namespace FinEngine {
 
-    class FinGame {
+    class FINENGINE_API FinGame {
         public:
             FinGame(int gameWidth, int gameHeight, FinState *initialState);
             ~FinGame();

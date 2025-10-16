@@ -1,6 +1,7 @@
 {
     "version": 8,
     "configurePresets": [
+
         {
             "name": "macos-clang-arm64-base",
             "hidden": true,
@@ -14,7 +15,9 @@
         {
             "name": "macos-clang-arm64-Debug-config",
             "displayName": "macOS Clang ARM64 (Debug)",
-            "inherits": ["macos-clang-arm64-base"],
+            "inherits": [
+                "macos-clang-arm64-base"
+            ],
             "description": "Configure for macOS on ARM64 in Debug mode using Clang",
             "binaryDir": "${sourceDir}/out/build/macos-clang-arm64/Debug",
             "cacheVariables": {
@@ -25,17 +28,96 @@
         {
             "name": "macos-clang-arm64-Release-config",
             "displayName": "macOS Clang ARM64 (Release)",
-            "inherits": ["macos-clang-arm64-base"],
+            "inherits": [
+                "macos-clang-arm64-base"
+            ],
             "description": "Configure for macOS on ARM64 in Release mode using Clang",
             "binaryDir": "${sourceDir}/out/build/macos-clang-arm64/Release",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
                 "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/macos-clang-arm64/Release"
             }
+        },
+
+
+        {
+            "name": "windows-gcc-x86_64-base",
+            "hidden": true,
+            "description": "Base preset for Windows x86_64 using MinGW-w64 GCC",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "C:/msys64/ucrt64/bin/gcc.exe",
+                "CMAKE_CXX_COMPILER": "C:/msys64/ucrt64/bin/g++.exe"
+            }
+        },
+        {
+            "name": "windows-gcc-x86_64-Debug-config",
+            "displayName": "Windows GCC x86_64 (Debug)",
+            "inherits": [
+                "windows-gcc-x86_64-base"
+            ],
+            "description": "Configure for Windows on x86_64 in Debug mode using MinGW-w64 GCC",
+            "binaryDir": "${sourceDir}/out/build/windows-gcc-x86_64/Debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/windows-gcc-x86_64/Debug"
+            }
+        },
+        {
+            "name": "windows-gcc-x86_64-Release-config",
+            "displayName": "Windows GCC x86_64 (Release)",
+            "inherits": [
+                "windows-gcc-x86_64-base"
+            ],
+            "description": "Configure for Windows on x86_64 in Release mode using MinGW-w64 GCC",
+            "binaryDir": "${sourceDir}/out/build/windows-gcc-x86_64/Release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/windows-gcc-x86_64/Release"
+            }
         }
+
+        ,
+        {
+            "name": "windows-msvc-x64-base",
+            "hidden": true,
+            "description": "Base preset for Windows x64 using Visual Studio 2022 (MSVC)",
+            "generator": "Visual Studio 17 2022",
+            "architecture": {
+                "value": "x64"
+            },
+            "binaryDir": "${sourceDir}/out/build/${presetName}"
+        },
+        {
+            "name": "windows-msvc-x64-Debug-config",
+            "displayName": "Windows MSVC x64 (Debug)",
+            "inherits": [
+                "windows-msvc-x64-base"
+            ],
+            "description": "Configure for Windows x64 in Debug mode using Visual Studio 2022",
+            "binaryDir": "${sourceDir}/out/build/windows-msvc-x64/Debug",
+            "cacheVariables": {
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/windows-msvc-x64/Debug"
+            }
+        },
+        {
+            "name": "windows-msvc-x64-Release-config",
+            "displayName": "Windows MSVC x64 (Release)",
+            "inherits": [
+                "windows-msvc-x64-base"
+            ],
+            "description": "Configure for Windows x64 in Release mode using Visual Studio 2022",
+            "binaryDir": "${sourceDir}/out/build/windows-msvc-x64/Release",
+            "cacheVariables": {
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/windows-msvc-x64/Release"
+            }
+        }
+
     ],
 
     "buildPresets": [
+
         {
             "name": "macos-clang-arm64-Debug",
             "configurePreset": "macos-clang-arm64-Debug-config",
@@ -53,14 +135,85 @@
             "configurePreset": "macos-clang-arm64-Debug-config",
             "displayName": "Install macOS Clang ARM64 Debug",
             "description": "Build and install (cmake --install) Debug artifacts",
-            "targets": ["install"]
+            "targets": [
+                "install"
+            ]
         },
         {
             "name": "macos-clang-arm64-Release-install",
             "configurePreset": "macos-clang-arm64-Release-config",
             "displayName": "Install macOS Clang ARM64 Release",
             "description": "Build and install (cmake --install) Release artifacts",
-            "targets": ["install"]
+            "targets": [
+                "install"
+            ]
+        },
+
+        {
+            "name": "windows-gcc-x86_64-Debug",
+            "configurePreset": "windows-gcc-x86_64-Debug-config",
+            "displayName": "Build Windows GCC x86_64 Debug",
+            "description": "Build for Windows on x86_64 in Debug mode using MinGW-w64 GCC"
+        },
+        {
+            "name": "windows-gcc-x86_64-Release",
+            "configurePreset": "windows-gcc-x86_64-Release-config",
+            "displayName": "Build Windows GCC x86_64 Release",
+            "description": "Build for Windows on x86_64 in Release mode using MinGW-w64 GCC"
+        },
+        {
+            "name": "windows-gcc-x86_64-Debug-install",
+            "configurePreset": "windows-gcc-x86_64-Debug-config",
+            "displayName": "Install Windows GCC x86_64 Debug",
+            "description": "Build and install (cmake --install) Debug artifacts",
+            "targets": [
+                "install"
+            ]
+        },
+        {
+            "name": "windows-gcc-x86_64-Release-install",
+            "configurePreset": "windows-gcc-x86_64-Release-config",
+            "displayName": "Install Windows GCC x86_64 Release",
+            "description": "Build and install (cmake --install) Release artifacts",
+            "targets": [
+                "install"
+            ]
         }
+        ,
+        {
+            "name": "windows-msvc-x64-Debug",
+            "configurePreset": "windows-msvc-x64-Debug-config",
+            "displayName": "Build Windows MSVC x64 Debug",
+            "description": "Build for Windows x64 in Debug mode using Visual Studio 2022",
+            "configuration": "Debug"
+        },
+        {
+            "name": "windows-msvc-x64-Release",
+            "configurePreset": "windows-msvc-x64-Release-config",
+            "displayName": "Build Windows MSVC x64 Release",
+            "description": "Build for Windows x64 in Release mode using Visual Studio 2022",
+            "configuration": "Release"
+        },
+        {
+            "name": "windows-msvc-x64-Debug-install",
+            "configurePreset": "windows-msvc-x64-Debug-config",
+            "displayName": "Install Windows MSVC x64 Debug",
+            "description": "Build and install (cmake --install) Debug artifacts",
+            "configuration": "Debug",
+            "targets": [
+                "install"
+            ]
+        },
+        {
+            "name": "windows-msvc-x64-Release-install",
+            "configurePreset": "windows-msvc-x64-Release-config",
+            "displayName": "Install Windows MSVC x64 Release",
+            "description": "Build and install (cmake --install) Release artifacts",
+            "configuration": "Release",
+            "targets": [
+                "install"
+            ]
+        }
+        
     ]
 }
