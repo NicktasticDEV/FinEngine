@@ -12,7 +12,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # ==========================================
 set(FinEngine_SRC
     "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Core/FinGame.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Graphics/Graphics_Desktop.cpp"
+
 
     # External Libraries
     "${CMAKE_CURRENT_SOURCE_DIR}/external/glad/src/glad.c"

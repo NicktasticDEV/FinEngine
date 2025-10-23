@@ -4,13 +4,15 @@
 
 namespace FinEngine {
 
-    class FINENGINE_API FinState {
+    class FINENGINE_API FinBasic {
         public:
-            virtual ~FinState() = default;
             virtual void init() = 0;
             virtual void update() = 0;
             virtual void render() = 0;
-            virtual void cleanup() = 0;
+            virtual void destroy() = 0;
+
+            bool visible = true;
+            bool active = true;
     };
 
 }

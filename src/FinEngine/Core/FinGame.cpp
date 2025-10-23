@@ -1,8 +1,8 @@
-#include "FinEngine.h"
+#include "FinEngine/Core/FinGame.h"
+#include "FinEngine/Log.h"
+
 #include <stdio.h>
 #include <stdlib.h>
-
-#include "FinEngine/Graphics.h"
 
 namespace FinEngine {
     FinGame* FinGame::s_instance = nullptr;
@@ -13,25 +13,15 @@ namespace FinEngine {
             s_instance = this;
         }
 
-        printf("FinGame: Game Initialized (Width: %d, Height: %d)\n", initialGameWidth, initialGameHeight);
-
-        // Initialize Systems
-        GFX_Init();
+        LOG_INFO("FinGame", "Game Initialized (Width: " + std::to_string(initialGameWidth) + ", Height: " + std::to_string(initialGameHeight) + ")");
 
         // State update
         while (isRunning) {
 
-            // If the window requests close, exit the game loop
-            if (GFX_ShouldClose()) {
-                printf("FinGame: Window close requested\n");
-                Exit();
-            }
-
             // State init
             if (nextState)
             {
-                printf("FinGame: Switching State\n");
-
+                LOG_INFO("FinGame", "Switching State");
                 if (currentState)
                 {
                     currentState->cleanup();
@@ -44,7 +34,7 @@ namespace FinEngine {
                 if (currentState)
                 {
                     currentState->init();
-                    printf("FinGame: State Initialized\n");
+                    LOG_INFO("FinGame", "State Initialized");
                 }
             }
 
@@ -58,21 +48,20 @@ namespace FinEngine {
             delete currentState;
             currentState = nullptr;
         }
-        GFX_Shutdown();
     }
 
     void FinGame::SwitchState(FinState* state) {
-        printf("FinGame: Switch state function called\n");
+        LOG_INFO("FinGame", "Switch state function called");
         nextState = state;
     }
     
     void FinGame::Exit() {
-        printf("FinGame: Exit function called\n");
+        LOG_INFO("FinGame", "Exit function called");
         isRunning = false;
     }
 
     FinGame::~FinGame() {
-        printf("FinGame: Game Terminated\n");
+        LOG_INFO("FinGame", "Game Terminated");
         if (s_instance == this) {
             s_instance = nullptr;
         }
