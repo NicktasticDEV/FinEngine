@@ -3,69 +3,120 @@ project(FinEngine)
 include(cmake/CPM.cmake)
 
 # ==========================================
-# Options
-# ==========================================
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
-# ==========================================
 # Source and Header Files
 # ==========================================
+
+# ===== Core sources =====
 set(FinEngine_SRC
     "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Core/FinGame.cpp"
 
-
-    # External Libraries
-    "${CMAKE_CURRENT_SOURCE_DIR}/external/glad/src/glad.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Platform/System/System.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Platform/Graphics/Graphics.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Platform/Audio/Audio.cpp"
 )
 
+# ===== Platform-specific sources =====
+# Nintendo Wii
+if(CMAKE_SYSTEM_NAME STREQUAL "NintendoWii")
+    list(APPEND FinEngine_SRC
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Platform/System/Wii/System_Wii.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Platform/Graphics/GX/Graphics_GX.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Platform/Audio/Wii/Audio_Wii.cpp"
+    )
+endif()
+
+# ===== Include directories =====
 set(FinEngine_INCLUDE
     "${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
 
 # ==========================================
+# Options
+# ==========================================
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+# ==========================================
 # Library Target
 # ==========================================
-add_library(${PROJECT_NAME} SHARED ${FinEngine_SRC})
+add_library(${PROJECT_NAME} ${FinEngine_SRC})
 target_include_directories(${PROJECT_NAME} 
     PUBLIC 
         $<BUILD_INTERFACE:${FinEngine_INCLUDE}>
         $<INSTALL_INTERFACE:include>
-    PRIVATE 
-        "${CMAKE_CURRENT_SOURCE_DIR}/external/glad/include"
+    PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/src"
 )
 
-target_compile_definitions(${PROJECT_NAME}
-    PRIVATE FINENGINE_BUILD_DLL
-)
+# ==========================================
+# Defines
+# ==========================================
 
-# On Windows, export all symbols by default so consumers can link without
-# needing explicit __declspec(dllexport) annotations.
-set_target_properties(${PROJECT_NAME} PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+# Windows Platform
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    target_compile_definitions(${PROJECT_NAME}
+        PRIVATE FINENGINE_PLATFORM_WINDOWS
+    )
+
+    # On Windows, export all symbols by default so consumers can link without
+    # needing explicit __declspec(dllexport) annotations.
+    set_target_properties(${PROJECT_NAME} PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+    message(STATUS "Building for Windows platform")
+endif()
+
+# MacOS Platform
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    target_compile_definitions(${PROJECT_NAME}
+        PRIVATE FINENGINE_PLATFORM_MACOS
+    )
+    message(STATUS "Building for macOS platform")
+endif()
+
+# Desktop Platform (Windows, Linux, macOS)
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows" OR CMAKE_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    target_compile_definitions(${PROJECT_NAME}
+        PRIVATE FINENGINE_PLATFORM_DESKTOP
+    )
+    message(STATUS "Building for Desktop platform")
+endif()
+
+# Wii Platform
+if (CMAKE_SYSTEM_NAME STREQUAL "NintendoWii")
+    target_compile_definitions(${PROJECT_NAME}
+        PRIVATE FINENGINE_PLATFORM_WII
+    )
+    message(STATUS "Building for Nintendo Wii platform")
+endif()
 
 # ==========================================
 # Dependencies
 # ==========================================
-# OpenGL
-find_package(OpenGL REQUIRED)
 
-# GLFW
-CPMAddPackage(
-    NAME glfw
-    GIT_TAG 3.3-stable
-    GITHUB_REPOSITORY glfw/glfw
-    OPTIONS 
-        "GLFW_BUILD_DOCS OFF"
-        "GLFW_BUILD_TESTS OFF" 
-        "GLFW_BUILD_EXAMPLES OFF" 
-        "BUILD_SHARED_LIBS OFF"
-)
+# Wii Dependencies
+if (CMAKE_SYSTEM_NAME STREQUAL "NintendoWii")
+    message(STATUS "Configuring dependencies for Nintendo Wii platform")
+    include("${DEVKITPRO}/cmake/Wii.cmake")
+    # Include and lib paths for devkitPro
+    target_include_directories(${PROJECT_NAME} PRIVATE
+        "$ENV{DEVKITPRO}/libogc/include"
+        "$ENV{DEVKITPRO}/portlibs/ppc/include"
+        "$ENV{DEVKITPRO}/portlibs/wii/include"
+    )
+    target_link_directories(${PROJECT_NAME} PRIVATE
+        "$ENV{DEVKITPRO}/libogc/lib/wii"
+        "$ENV{DEVKITPRO}/portlibs/ppc/lib"
+        "$ENV{DEVKITPRO}/portlibs/wii/lib"
+    )
 
-# Add dependency to the target
-target_link_libraries(${PROJECT_NAME} 
-    PRIVATE
-        glfw
-        OpenGL::GL
-)
+    target_link_libraries(${PROJECT_NAME}
+        ogc
+        m
+        fat
+        bte
+        audiogc
+        wiiuse
+        aesnd
+    )
+endif()
 
 # ==========================================
 # Installation
