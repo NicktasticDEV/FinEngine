@@ -9,6 +9,7 @@ include(cmake/CPM.cmake)
 # ===== Core sources =====
 set(FinEngine_SRC
     "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Core/FinGame.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Core/FinBasic.cpp"
 
     "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Platform/System/System.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Platform/Graphics/Graphics.cpp"
