@@ -2,10 +2,9 @@ cmake_minimum_required(VERSION 3.25)
 project(FinEngine)
 include(cmake/CPM.cmake)
 
-# ==========================================
+# ====================================================================================
 # Source and Header Files
-# ==========================================
-
+# ====================================================================================
 # ===== Core sources =====
 set(FinEngine_SRC
     "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Core/FinGame.cpp"
@@ -15,6 +14,7 @@ set(FinEngine_SRC
     "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Platform/Graphics/Graphics.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Platform/Audio/Audio.cpp"
 )
+
 
 # ===== Platform-specific sources =====
 # Nintendo Wii
@@ -26,19 +26,28 @@ if(CMAKE_SYSTEM_NAME STREQUAL "NintendoWii")
     )
 endif()
 
+
 # ===== Include directories =====
 set(FinEngine_INCLUDE
     "${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
+# ====================================================================================
 
-# ==========================================
+
+
+
+# ====================================================================================
 # Options
-# ==========================================
+# ====================================================================================
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+# ====================================================================================
 
-# ==========================================
+
+
+
+# ====================================================================================
 # Library Target
-# ==========================================
+# ====================================================================================
 add_library(${PROJECT_NAME} ${FinEngine_SRC})
 target_include_directories(${PROJECT_NAME} 
     PUBLIC 
@@ -47,12 +56,24 @@ target_include_directories(${PROJECT_NAME}
     PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/src"
 )
+# ====================================================================================
 
-# ==========================================
+
+
+
+# ====================================================================================
 # Defines
-# ==========================================
+# ====================================================================================
+# ===== General Desktop Platform =====
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows" OR CMAKE_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    target_compile_definitions(${PROJECT_NAME}
+        PRIVATE FINENGINE_PLATFORM_DESKTOP
+    )
+    message(STATUS "Building for Desktop platform")
+endif()
 
-# Windows Platform
+
+# ===== Windows Platform =====
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     target_compile_definitions(${PROJECT_NAME}
         PRIVATE FINENGINE_PLATFORM_WINDOWS
@@ -64,7 +85,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     message(STATUS "Building for Windows platform")
 endif()
 
-# MacOS Platform
+
+# ===== MacOS Platform =====
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_compile_definitions(${PROJECT_NAME}
         PRIVATE FINENGINE_PLATFORM_MACOS
@@ -72,27 +94,23 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     message(STATUS "Building for macOS platform")
 endif()
 
-# Desktop Platform (Windows, Linux, macOS)
-if (CMAKE_SYSTEM_NAME STREQUAL "Windows" OR CMAKE_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-    target_compile_definitions(${PROJECT_NAME}
-        PRIVATE FINENGINE_PLATFORM_DESKTOP
-    )
-    message(STATUS "Building for Desktop platform")
-endif()
 
-# Wii Platform
+# ===== Wii Platform =====
 if (CMAKE_SYSTEM_NAME STREQUAL "NintendoWii")
     target_compile_definitions(${PROJECT_NAME}
         PRIVATE FINENGINE_PLATFORM_WII
     )
     message(STATUS "Building for Nintendo Wii platform")
 endif()
+# ====================================================================================
 
-# ==========================================
+
+
+
+# ====================================================================================
 # Dependencies
-# ==========================================
-
-# Wii Dependencies
+# ====================================================================================
+# ===== Wii Dependencies =====
 if (CMAKE_SYSTEM_NAME STREQUAL "NintendoWii")
     message(STATUS "Configuring dependencies for Nintendo Wii platform")
     include("${DEVKITPRO}/cmake/Wii.cmake")
@@ -118,10 +136,14 @@ if (CMAKE_SYSTEM_NAME STREQUAL "NintendoWii")
         aesnd
     )
 endif()
+# ====================================================================================
 
-# ==========================================
+
+
+
+# ====================================================================================
 # Installation
-# ==========================================
+# ====================================================================================
 install(TARGETS ${PROJECT_NAME}
     EXPORT FinEngineTargets
     RUNTIME DESTINATION bin
@@ -134,3 +156,4 @@ install(EXPORT FinEngineTargets
     NAMESPACE FinEngine::
     DESTINATION lib/cmake/FinEngine
 )
+# ====================================================================================
