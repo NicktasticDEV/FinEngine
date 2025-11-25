@@ -1,16 +1,18 @@
 #pragma once
 
 #include "FinEngine/FinEngineAPI.h"
+#include "FinEngine/Core/FinGroup.h"
+#include "FinEngine/Core/FinBasic.h"
 
 namespace FinEngine {
 
-    class FINENGINE_API FinState {
+    class FINENGINE_API FinState : public FinGroup  {
         public:
-            virtual ~FinState() = default;
-            virtual void init() = 0;
-            virtual void update() = 0;
-            virtual void render() = 0;
-            virtual void cleanup() = 0;
+
+            virtual void create() {};
+            void update() override;
+            void draw() override;
+            void destroy() override;
     };
 
 }

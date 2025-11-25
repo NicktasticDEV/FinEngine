@@ -6,10 +6,12 @@ namespace FinEngine {
 
     class FINENGINE_API FinBasic {
         public:
-            virtual void init() = 0;
-            virtual void update() = 0;
-            virtual void render() = 0;
-            virtual void destroy() = 0;
+            FinBasic() {};
+            virtual ~FinBasic() = default;
+
+            virtual void update() {};
+            virtual void draw() {};
+            virtual void destroy() {};
 
             bool visible = true;
             bool active = true;
