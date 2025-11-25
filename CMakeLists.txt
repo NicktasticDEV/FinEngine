@@ -2,13 +2,16 @@ cmake_minimum_required(VERSION 3.25)
 project(FinEngine)
 include(cmake/CPM.cmake)
 
+message(STATUS "")
+message(STATUS "========== Configuring FinEngine ==========")
+
 # ====================================================================================
 # Source and Header Files
 # ====================================================================================
 # ===== Core sources =====
 set(FinEngine_SRC
     "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Core/FinGame.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Core/FinBasic.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Core/FinState.cpp"
 
     "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Platform/System/System.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Platform/Graphics/Graphics.cpp"
@@ -69,7 +72,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows" OR CMAKE_SYSTEM_NAME STREQUAL "Linux" O
     target_compile_definitions(${PROJECT_NAME}
         PRIVATE FINENGINE_PLATFORM_DESKTOP
     )
-    message(STATUS "Building for Desktop platform")
+    message(STATUS "Building for: Desktop Platform")
 endif()
 
 
@@ -82,7 +85,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     # On Windows, export all symbols by default so consumers can link without
     # needing explicit __declspec(dllexport) annotations.
     set_target_properties(${PROJECT_NAME} PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
-    message(STATUS "Building for Windows platform")
+    message(STATUS "Building for: Windows")
 endif()
 
 
@@ -91,7 +94,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_compile_definitions(${PROJECT_NAME}
         PRIVATE FINENGINE_PLATFORM_MACOS
     )
-    message(STATUS "Building for macOS platform")
+    message(STATUS "Building for: macOS")
 endif()
 
 
@@ -100,7 +103,15 @@ if (CMAKE_SYSTEM_NAME STREQUAL "NintendoWii")
     target_compile_definitions(${PROJECT_NAME}
         PRIVATE FINENGINE_PLATFORM_WII
     )
-    message(STATUS "Building for Nintendo Wii platform")
+    message(STATUS "Building for: Nintendo Wii")
+endif()
+
+# ===== Debug Mode =====
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_compile_definitions(${PROJECT_NAME}
+        PRIVATE FINENGINE_DEBUG
+    )
+    message(STATUS "Building config: Debug")
 endif()
 # ====================================================================================
 
@@ -112,7 +123,6 @@ endif()
 # ====================================================================================
 # ===== Wii Dependencies =====
 if (CMAKE_SYSTEM_NAME STREQUAL "NintendoWii")
-    message(STATUS "Configuring dependencies for Nintendo Wii platform")
     include("${DEVKITPRO}/cmake/Wii.cmake")
     # Include and lib paths for devkitPro
     target_include_directories(${PROJECT_NAME} PRIVATE
@@ -157,3 +167,6 @@ install(EXPORT FinEngineTargets
     DESTINATION lib/cmake/FinEngine
 )
 # ====================================================================================
+
+message(STATUS "========== Finished Configuring FinEngine ==========")
+message(STATUS "")

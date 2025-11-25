@@ -1,5 +1,8 @@
 #include "System.h"
+
+#if defined(FINENGINE_PLATFORM_WII)
 #include "Wii/System_Wii.h"
+#endif
 
 namespace FinEngine {
 

@@ -12,7 +12,7 @@ namespace FinEngine {
 
     class FINENGINE_API FinGame {
         public:
-            FinGame(int gameWidth, int gameHeight, FinState *initialState);
+            FinGame(int gameWidth, int gameHeight, FinState* initialState);
             ~FinGame();
 
             const int initialGameWidth;

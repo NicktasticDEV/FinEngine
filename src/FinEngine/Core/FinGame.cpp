@@ -23,11 +23,9 @@ namespace FinEngine {
         // Create and initialize systems owned by this game instance
         system_.reset(System::Create());
         graphics_.reset(Graphics::Create());
-        audio_.reset(Audio::Create());
 
         system_->Init();
         graphics_->Init();
-        audio_->Init();
 
         LOG_INFO("FinGame", "Game Initialized (Width: " + std::to_string(initialGameWidth) + ", Height: " + std::to_string(initialGameHeight) + ")");
 
@@ -37,37 +35,50 @@ namespace FinEngine {
             // State init
             if (nextState)
             {
-                LOG_INFO("FinGame", "Switching State");
+                LOG_INFO("FinGame", "Switching 2 Damn State");
+
                 if (currentState)
                 {
-                    currentState->cleanup();
+                    LOG_INFO("FinGame", "Destroying current state");
+                    currentState->destroy();
                     delete currentState;
+                    currentState = nullptr;
+                    LOG_INFO("FinGame", "Current state destroyed");
                 }
 
+                LOG_INFO("FinGame", "Switching to next state");
                 currentState = nextState;
                 nextState = nullptr;
 
                 if (currentState)
                 {
-                    currentState->init();
+                    LOG_INFO("FinGame", "Creating current state");
+                    currentState->create();
                 }
-            }
+                else
+                {
+                    LOG_INFO("FinGame", "No next state to switch to, exiting game loop");
+                }
+
+
+                LOG_INFO("FinGame", "State Switched");
+            };
 
             currentState->update();
-            currentState->render();
+            currentState->draw();
         }
 
         // Exit
+        LOG_INFO("FinGame", "Exiting");
         if (currentState) {
-            currentState->cleanup();
+            currentState->destroy();
             delete currentState;
             currentState = nullptr;
         }
 
-        // Shutdown systems
-        audio_->Shutdown();
         graphics_->Shutdown();
         system_->Shutdown();
+        LOG_INFO("FinGame", "Shutdown complete");
     }
 
     void FinGame::SwitchState(FinState* state) {
