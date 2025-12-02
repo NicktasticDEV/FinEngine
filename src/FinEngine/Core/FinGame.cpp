@@ -3,11 +3,13 @@
 #include "FinEngine/Log.h"
 #include "FinEngine/Platform/System/System.h"
 #include "FinEngine/Platform/Graphics/Graphics.h"
-#include "FinEngine/Platform/Audio/Audio.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory>
+#include <cmath>
+#include <chrono>
+#include <thread>
 
 namespace FinEngine {
     FinGame* FinGame::s_instance = nullptr;
@@ -31,11 +33,12 @@ namespace FinEngine {
 
         // State update
         while (isRunning) {
+            system_->Update();
 
             // State init
             if (nextState)
             {
-                LOG_INFO("FinGame", "Switching 2 Damn State");
+                LOG_INFO("FinGame", "Next state requested");
 
                 if (currentState)
                 {
@@ -43,7 +46,6 @@ namespace FinEngine {
                     currentState->destroy();
                     delete currentState;
                     currentState = nullptr;
-                    LOG_INFO("FinGame", "Current state destroyed");
                 }
 
                 LOG_INFO("FinGame", "Switching to next state");
@@ -52,7 +54,7 @@ namespace FinEngine {
 
                 if (currentState)
                 {
-                    LOG_INFO("FinGame", "Creating current state");
+                    LOG_INFO("FinGame", "Creating next state");
                     currentState->create();
                 }
                 else
@@ -61,15 +63,16 @@ namespace FinEngine {
                 }
 
 
-                LOG_INFO("FinGame", "State Switched");
+                LOG_INFO("FinGame", "Next state switch complete");
             };
 
             currentState->update();
             currentState->draw();
+            graphics_->DrawDone();
         }
 
         // Exit
-        LOG_INFO("FinGame", "Exiting");
+        LOG_INFO("FinGame", "Shutting down");
         if (currentState) {
             currentState->destroy();
             delete currentState;
@@ -79,6 +82,7 @@ namespace FinEngine {
         graphics_->Shutdown();
         system_->Shutdown();
         LOG_INFO("FinGame", "Shutdown complete");
+        exit(0);
     }
 
     void FinGame::SwitchState(FinState* state) {

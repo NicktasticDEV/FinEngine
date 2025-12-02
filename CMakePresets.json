@@ -78,42 +78,6 @@
             }
         }
 
-        ,
-        {
-            "name": "windows-msvc-x64-base",
-            "hidden": true,
-            "description": "Base preset for Windows x64 using Visual Studio 2022 (MSVC)",
-            "generator": "Visual Studio 17 2022",
-            "architecture": {
-                "value": "x64"
-            },
-            "binaryDir": "${sourceDir}/out/build/${presetName}"
-        },
-        {
-            "name": "windows-msvc-x64-Debug-config",
-            "displayName": "Windows MSVC x64 (Debug)",
-            "inherits": [
-                "windows-msvc-x64-base"
-            ],
-            "description": "Configure for Windows x64 in Debug mode using Visual Studio 2022",
-            "binaryDir": "${sourceDir}/out/build/windows-msvc-x64/Debug",
-            "cacheVariables": {
-                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/windows-msvc-x64/Debug"
-            }
-        },
-        {
-            "name": "windows-msvc-x64-Release-config",
-            "displayName": "Windows MSVC x64 (Release)",
-            "inherits": [
-                "windows-msvc-x64-base"
-            ],
-            "description": "Configure for Windows x64 in Release mode using Visual Studio 2022",
-            "binaryDir": "${sourceDir}/out/build/windows-msvc-x64/Release",
-            "cacheVariables": {
-                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/windows-msvc-x64/Release"
-            }
-        }
-
     ],
 
     "buildPresets": [
@@ -175,41 +139,6 @@
             "configurePreset": "windows-gcc-x86_64-Release-config",
             "displayName": "Install Windows GCC x86_64 Release",
             "description": "Build and install (cmake --install) Release artifacts",
-            "targets": [
-                "install"
-            ]
-        }
-        ,
-        {
-            "name": "windows-msvc-x64-Debug",
-            "configurePreset": "windows-msvc-x64-Debug-config",
-            "displayName": "Build Windows MSVC x64 Debug",
-            "description": "Build for Windows x64 in Debug mode using Visual Studio 2022",
-            "configuration": "Debug"
-        },
-        {
-            "name": "windows-msvc-x64-Release",
-            "configurePreset": "windows-msvc-x64-Release-config",
-            "displayName": "Build Windows MSVC x64 Release",
-            "description": "Build for Windows x64 in Release mode using Visual Studio 2022",
-            "configuration": "Release"
-        },
-        {
-            "name": "windows-msvc-x64-Debug-install",
-            "configurePreset": "windows-msvc-x64-Debug-config",
-            "displayName": "Install Windows MSVC x64 Debug",
-            "description": "Build and install (cmake --install) Debug artifacts",
-            "configuration": "Debug",
-            "targets": [
-                "install"
-            ]
-        },
-        {
-            "name": "windows-msvc-x64-Release-install",
-            "configurePreset": "windows-msvc-x64-Release-config",
-            "displayName": "Install Windows MSVC x64 Release",
-            "description": "Build and install (cmake --install) Release artifacts",
-            "configuration": "Release",
             "targets": [
                 "install"
             ]

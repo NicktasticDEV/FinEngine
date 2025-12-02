@@ -2,8 +2,19 @@ cmake_minimum_required(VERSION 3.25)
 project(FinEngine)
 include(cmake/CPM.cmake)
 
+# ====================================================================================
+# Options
+# ====================================================================================
+option(FINENGINE_BUILD_EXAMPLES "Build FinEngine example projects" OFF)
+# ====================================================================================
+
+
+
 message(STATUS "")
 message(STATUS "========== Configuring FinEngine ==========")
+
+
+
 
 # ====================================================================================
 # Source and Header Files
@@ -15,7 +26,11 @@ set(FinEngine_SRC
 
     "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Platform/System/System.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Platform/Graphics/Graphics.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Platform/Audio/Audio.cpp"
+)
+
+# ===== Include directories =====
+set(FinEngine_INCLUDE
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
 
 
@@ -25,22 +40,24 @@ if(CMAKE_SYSTEM_NAME STREQUAL "NintendoWii")
     list(APPEND FinEngine_SRC
         "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Platform/System/Wii/System_Wii.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Platform/Graphics/GX/Graphics_GX.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Platform/Audio/Wii/Audio_Wii.cpp"
+    )
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows" OR CMAKE_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    # Desktop Platforms
+    include_directories(SYSTEM "external/glad/include")
+
+    list(APPEND FinEngine_SRC
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Platform/System/Desktop/System_Desktop.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Platform/Graphics/GL/Graphics_GL.cpp"
+        "external/glad/src/glad.c"
     )
 endif()
-
-
-# ===== Include directories =====
-set(FinEngine_INCLUDE
-    "${CMAKE_CURRENT_SOURCE_DIR}/include"
-)
 # ====================================================================================
 
 
 
 
 # ====================================================================================
-# Options
+# Set
 # ====================================================================================
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # ====================================================================================
@@ -121,6 +138,18 @@ endif()
 # ====================================================================================
 # Dependencies
 # ====================================================================================
+
+# ===== Desktop Dependencies =====
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows" OR CMAKE_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    find_package(OpenGL REQUIRED)
+    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/glfw")
+
+    target_link_libraries(${PROJECT_NAME}
+        glfw
+        OpenGL::GL
+    )
+endif()
+
 # ===== Wii Dependencies =====
 if (CMAKE_SYSTEM_NAME STREQUAL "NintendoWii")
     include("${DEVKITPRO}/cmake/Wii.cmake")
@@ -136,7 +165,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "NintendoWii")
         "$ENV{DEVKITPRO}/portlibs/wii/lib"
     )
 
-    target_link_libraries(${PROJECT_NAME}
+    target_link_libraries(${PROJECT_NAME} PUBLIC
         ogc
         m
         fat
@@ -170,3 +199,17 @@ install(EXPORT FinEngineTargets
 
 message(STATUS "========== Finished Configuring FinEngine ==========")
 message(STATUS "")
+
+
+
+
+# ====================================================================================
+# Examples
+# ====================================================================================
+#[[
+if(FINENGINE_BUILD_EXAMPLES)
+    message(STATUS "Building FinEngine example projects")
+    add_subdirectory(examples)
+endif()
+]]#
+# ====================================================================================

@@ -36,7 +36,6 @@ namespace FinEngine {
             // Owned systems (single instances per game)
             std::unique_ptr<System> system_;
             std::unique_ptr<Graphics> graphics_;
-            std::unique_ptr<Audio> audio_;
     };
 
 }

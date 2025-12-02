@@ -4,7 +4,7 @@
 
 namespace FinEngine {
 
-    class Graphics_GX : public Graphics {
+    class Graphics_GL : public Graphics {
         public:
             void Init() override;
             void Shutdown() override;

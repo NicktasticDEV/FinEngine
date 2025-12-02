@@ -1,20 +1,16 @@
 #pragma once
 #include "../System.h"
-
-#include <gccore.h>
+#include <GLFW/glfw3.h>
 
 namespace FinEngine {
 
-    class System_Wii : public System {
+    class System_Desktop : public System {
         public:
-            static GXRModeObj *rmode;
-            static void *xfb[2];
-            static int currentXfb;
+            static GLFWwindow* window;
 
             void Init() override;
             void Update() override;
             void Shutdown() override;
-
     };
 
 }

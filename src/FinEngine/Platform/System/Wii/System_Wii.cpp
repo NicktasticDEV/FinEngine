@@ -13,7 +13,7 @@ namespace FinEngine {
     int System_Wii::currentXfb = 0;
 
     void System_Wii::Init() {
-        LOG_INFO("System_Wii", "Initializing");
+        LOG_INFO("System", "Initializing for Wii platform");
 
         // Initialise the video system
         VIDEO_Init();
@@ -35,10 +35,10 @@ namespace FinEngine {
         VIDEO_Configure(rmode);
 
         // Tell the video hardware where our display memory is
-        VIDEO_SetNextFramebuffer(xfb[0]);
+        VIDEO_SetNextFramebuffer(xfb[currentXfb]);
 
         // Clear the framebuffer
-        VIDEO_ClearFrameBuffer(rmode, xfb[0], COLOR_BLACK);
+        VIDEO_ClearFrameBuffer(rmode, xfb[currentXfb], COLOR_BLACK);
 
         // Make the display visible
         VIDEO_SetBlack(false);
@@ -50,11 +50,15 @@ namespace FinEngine {
         VIDEO_WaitVSync();
         if(rmode->viTVMode&VI_NON_INTERLACE) VIDEO_WaitVSync();
 
-        LOG_INFO("System_Wii", "System Initialized");
+        LOG_INFO("System", "System Initialized");
+    }
+
+    void System_Wii::Update() {
+        
     }
 
     void System_Wii::Shutdown() {
-        LOG_INFO("System_Wii", "Shutting down");
+        LOG_INFO("System", "Shutting down");
         // Set the screen to black
         VIDEO_SetBlack(true);
 

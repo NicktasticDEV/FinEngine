@@ -11,7 +11,11 @@
 namespace FinEngine {
 
     void Graphics_GX::Init() {
-        LOG_INFO("Graphics_GX", "Initializing");
+        LOG_INFO("Graphics", "Initializing with GX backend");
+
+        Mtx GXmodelView2D;
+        Mtx44 perspective;
+
         // Initialize the GX graphics system
         static u8 fifo[DEFAULT_FIFO_SIZE] ATTRIBUTE_ALIGN(32);
         GX_Init(fifo, DEFAULT_FIFO_SIZE);
@@ -35,53 +39,83 @@ namespace FinEngine {
         }
         GX_SetDispCopyGamma(GX_GM_1_0);
 
-        LOG_INFO("Graphics_GX", "Width: " + std::to_string(fbw) + ", height: " + std::to_string(efbh));
+        // Vertex things
+        // Setup the vertex descriptor
+        GX_ClearVtxDesc();      // clear all the vertex descriptors
+        GX_InvVtxCache();       // Invalidate the vertex cache
+        GX_InvalidateTexAll();  // Invalidate all textures
+
+        // Tells the flipper to expect direct data
+        GX_SetVtxDesc(GX_VA_TEX0, GX_NONE);
+        GX_SetVtxDesc(GX_VA_POS,  GX_DIRECT);
+        GX_SetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+
+        GX_SetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS,  GX_POS_XYZ,  GX_F32, 0);
+        GX_SetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST,   GX_F32, 0);
+        // Colour 0 is 8bit RGBA format
+        GX_SetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+        GX_SetZMode(GX_FALSE, GX_LEQUAL, GX_TRUE);
+
+        GX_SetNumChans(1);    // colour is the same as vertex colour
+        GX_SetNumTexGens(1);  // One texture exists
+        GX_SetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+        GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+        GX_SetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
+
+        guMtxIdentity(GXmodelView2D);
+        guMtxTransApply(GXmodelView2D, GXmodelView2D, 0.0f, 0.0f, -100.0f);
+        GX_LoadPosMtxImm(GXmodelView2D, GX_PNMTX0);
+
+        guOrtho(perspective, 0.0f, System_Wii::rmode->efbHeight, 0.0f, System_Wii::rmode->fbWidth, 0.0f, 1000.0f);
+        GX_LoadProjectionMtx(perspective, GX_ORTHOGRAPHIC);
+
+        GX_SetViewport(0.0f, 0.0f, System_Wii::rmode->fbWidth, System_Wii::rmode->efbHeight, 0.0f, 1.0f);
+        GX_SetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+        GX_SetAlphaUpdate(GX_TRUE);
+        GX_SetAlphaCompare(GX_GREATER, 0, GX_AOP_AND, GX_ALWAYS, 0);
+        GX_SetColorUpdate(GX_ENABLE);
+        GX_SetCullMode(GX_CULL_NONE);
+
+        LOG_INFO("Graphics", "Width: " + std::to_string(fbw) + ", height: " + std::to_string(efbh));
 
         if (CONF_GetAspectRatio() == CONF_ASPECT_16_9) {
-            LOG_INFO("Graphics_GX", "Aspect Ratio: 16:9");
+            LOG_INFO("Graphics", "Aspect Ratio: 16:9");
         } else if (CONF_GetAspectRatio() == CONF_ASPECT_4_3) {
-            LOG_INFO("Graphics_GX", "Aspect Ratio: 4:3");
+            LOG_INFO("Graphics", "Aspect Ratio: 4:3");
         } else {
-            LOG_INFO("Graphics_GX", "Aspect Ratio: Unknown");
+            LOG_INFO("Graphics", "Aspect Ratio: Unknown");
         }
 
-        LOG_INFO("Graphics_GX", "Graphics Initialized");
+        LOG_INFO("Graphics", "Graphics successfully initialized");
     }
 
     void Graphics_GX::Shutdown() {
-        LOG_INFO("Graphics_GX", "Shutting down");
-
+        LOG_INFO("Graphics", "Shutting down");
         GX_DrawDone();
         GX_AbortFrame();
     }
 
-    void Graphics_GX::TestDraw() {
-        // Simple test draw function to clear the screen with a color
-        // Important: You must copy the EFB to the XFB each frame, otherwise you'll flip to
-        // an uninitialized buffer and see flashing.
-
-        // Choose the buffer we'll display next
-        int next = 1 - System_Wii::currentXfb;
-
+    void Graphics_GX::TestDraw(float r, float g, float b) {
         // Clear color set for the EFB copy; alpha 0xFF for opaque
-        GX_SetCopyClear((GXColor){ 51, 76, 76, 0xFF }, GX_MAX_Z24);
+        GX_SetCopyClear((GXColor){ (u8)(r * 255), (u8)(g * 255), (u8)(b * 255), 0xFF }, GX_MAX_Z24);
+    }
+
+    void Graphics_GX::DrawDone() {
+        GX_DrawDone();
+
+        System_Wii::currentXfb ^= 1;
+
         GX_SetColorUpdate(GX_TRUE);
         GX_SetAlphaUpdate(GX_TRUE);
 
-        // Copy the EFB to the XFB we plan to display
-        GX_CopyDisp(System_Wii::xfb[next], GX_TRUE); // GX_TRUE clears EFB after copy
+        // Copy the EFB to the currently selected XFB
+        GX_CopyDisp(System_Wii::xfb[System_Wii::currentXfb], GX_TRUE);
         GX_DrawDone();
 
-        // Tell VI to display that XFB
-        VIDEO_SetNextFramebuffer(System_Wii::xfb[next]);
+        // Tell VI to display that XFB *now*
+        VIDEO_SetNextFramebuffer(System_Wii::xfb[System_Wii::currentXfb]);
         VIDEO_Flush();
         VIDEO_WaitVSync();
-        if (System_Wii::rmode->viTVMode & VI_NON_INTERLACE) {
-            VIDEO_WaitVSync();
-        }
-
-        // Update current buffer index for next frame
-        System_Wii::currentXfb = next;
     }
 
 }
