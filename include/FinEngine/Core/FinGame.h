@@ -12,11 +12,10 @@ namespace FinEngine {
 
     class FINENGINE_API FinGame {
         public:
-            FinGame(int gameWidth, int gameHeight, FinState* initialState);
+            FinGame(FinState* initialState);
             ~FinGame();
 
-            const int initialGameWidth;
-            const int initialGameHeight;
+            //void Run();
 
             static FinGame& instance() { return *s_instance; }
             static FinGame* instancePtr() { return s_instance; }
@@ -30,6 +29,10 @@ namespace FinEngine {
 
             FinState* currentState = nullptr;
             FinState* nextState = nullptr;
+
+            void Initialize();
+            void GameLoop();
+            void ShutDown();
 
             bool isRunning = true;
 

@@ -8,8 +8,11 @@ namespace FinEngine {
         public:
             void Init() override;
             void Shutdown() override;
-            void TestDraw(float r, float g, float b) override;
-            void DrawDone() override;
+
+
+            void BeginFrame() override;
+            void EndFrame() override;
+            void ClearScreen() override;
 
     };
 

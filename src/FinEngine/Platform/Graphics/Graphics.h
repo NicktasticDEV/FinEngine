@@ -8,8 +8,10 @@ namespace FinEngine {
 
             virtual void Init();
             virtual void Shutdown();
-            virtual void TestDraw(float r, float g, float b);
-            virtual void DrawDone();
+            
+            virtual void BeginFrame();
+            virtual void EndFrame();
+            virtual void ClearScreen();
 
             static Graphics* Create();
     };

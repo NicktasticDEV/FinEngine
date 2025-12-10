@@ -10,8 +10,10 @@ namespace FinEngine {
 
     void Graphics::Init() {}
     void Graphics::Shutdown() {}
-    void Graphics::TestDraw(float r, float g, float b) {}
-    void Graphics::DrawDone() {}
+    
+    void Graphics::BeginFrame() {}
+    void Graphics::EndFrame() {}
+    void Graphics::ClearScreen() {}
 
     Graphics* Graphics::Create() {
         #if  defined(FINENGINE_PLATFORM_WII)

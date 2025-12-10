@@ -16,7 +16,9 @@ namespace FinEngine {
         Mtx GXmodelView2D;
         Mtx44 perspective;
 
-        // Initialize the GX graphics system
+        // ========================================
+        // GX Initialization
+        // ========================================
         static u8 fifo[DEFAULT_FIFO_SIZE] ATTRIBUTE_ALIGN(32);
         GX_Init(fifo, DEFAULT_FIFO_SIZE);
         GX_SetCopyClear((GXColor){ 0, 0, 0, 0 }, GX_MAX_Z24);
@@ -26,63 +28,84 @@ namespace FinEngine {
 
         GX_SetViewport(0.0f, 0.0f, (f32)fbw, (f32)efbh, 0.0f, 1.0f);
         GX_SetScissor(0, 0, fbw, efbh);
+
         GX_SetDispCopySrc(0, 0, fbw, efbh);
         GX_SetDispCopyDst(fbw, efbh);
+
         GX_SetCopyFilter(System_Wii::rmode->aa, System_Wii::rmode->sample_pattern, GX_TRUE, System_Wii::rmode->vfilter);
-        GX_SetFieldMode(System_Wii::rmode->field_rendering,
-                        (System_Wii::rmode->viHeight == 2 * System_Wii::rmode->xfbHeight) ? GX_ENABLE : GX_DISABLE);
+        GX_SetFieldMode(System_Wii::rmode->field_rendering, (System_Wii::rmode->viHeight == 2 * System_Wii::rmode->xfbHeight) ? GX_ENABLE : GX_DISABLE);
 
         if (System_Wii::rmode->aa) {
             GX_SetPixelFmt(GX_PF_RGB565_Z16, GX_ZC_LINEAR);
         } else {
             GX_SetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);
         }
+        GX_SetCullMode(GX_CULL_NONE);
         GX_SetDispCopyGamma(GX_GM_1_0);
 
-        // Vertex things
-        // Setup the vertex descriptor
-        GX_ClearVtxDesc();      // clear all the vertex descriptors
-        GX_InvVtxCache();       // Invalidate the vertex cache
-        GX_InvalidateTexAll();  // Invalidate all textures
-
+        // ========================================
+        // Vertex data things
+        // ========================================
         // Tells the flipper to expect direct data
-        GX_SetVtxDesc(GX_VA_TEX0, GX_NONE);
+        GX_ClearVtxDesc();
         GX_SetVtxDesc(GX_VA_POS,  GX_DIRECT);
+        GX_SetVtxDesc(GX_VA_TEX0, GX_DIRECT);
         GX_SetVtxDesc(GX_VA_CLR0, GX_DIRECT);
 
+        // Set attributes for data
         GX_SetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS,  GX_POS_XYZ,  GX_F32, 0);
         GX_SetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST,   GX_F32, 0);
-        // Colour 0 is 8bit RGBA format
         GX_SetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-        GX_SetZMode(GX_FALSE, GX_LEQUAL, GX_TRUE);
 
-        GX_SetNumChans(1);    // colour is the same as vertex colour
-        GX_SetNumTexGens(1);  // One texture exists
-        GX_SetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
-        GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+        // ========================================
+        // TEV
+        // ========================================
+        GX_SetNumChans(1);
+        GX_SetNumTexGens(1);
         GX_SetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
 
+        GX_SetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+        GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+
+        // ========================================
+        // Matrices
+        // ========================================
+
+        // Projection
+        if (CONF_GetAspectRatio() == CONF_ASPECT_16_9) {
+            guOrtho(perspective, 0.0f, 480, 0.0f, 854, 0.0f, 1000.0f);
+        } 
+        else {
+            guOrtho(perspective, 0.0f, System_Wii::rmode->efbHeight, 0.0f, System_Wii::rmode->fbWidth, 0.0f, 1000.0f);
+        }
+        GX_LoadProjectionMtx(perspective, GX_ORTHOGRAPHIC);
+
+        // Model
         guMtxIdentity(GXmodelView2D);
         guMtxTransApply(GXmodelView2D, GXmodelView2D, 0.0f, 0.0f, -100.0f);
         GX_LoadPosMtxImm(GXmodelView2D, GX_PNMTX0);
 
-        guOrtho(perspective, 0.0f, System_Wii::rmode->efbHeight, 0.0f, System_Wii::rmode->fbWidth, 0.0f, 1000.0f);
-        GX_LoadProjectionMtx(perspective, GX_ORTHOGRAPHIC);
-
-        GX_SetViewport(0.0f, 0.0f, System_Wii::rmode->fbWidth, System_Wii::rmode->efbHeight, 0.0f, 1.0f);
-        GX_SetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
-        GX_SetAlphaUpdate(GX_TRUE);
-        GX_SetAlphaCompare(GX_GREATER, 0, GX_AOP_AND, GX_ALWAYS, 0);
+        // ========================================
+        // Other shit
+        // ========================================
         GX_SetColorUpdate(GX_ENABLE);
+        GX_SetAlphaUpdate(GX_TRUE);
+        GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+        /*
+        GX_SetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+        GX_SetAlphaCompare(GX_GREATER, 0, GX_AOP_AND, GX_ALWAYS, 0);
         GX_SetCullMode(GX_CULL_NONE);
+        */
 
         LOG_INFO("Graphics", "Width: " + std::to_string(fbw) + ", height: " + std::to_string(efbh));
 
         if (CONF_GetAspectRatio() == CONF_ASPECT_16_9) {
             LOG_INFO("Graphics", "Aspect Ratio: 16:9");
-        } else if (CONF_GetAspectRatio() == CONF_ASPECT_4_3) {
+        } 
+        else if (CONF_GetAspectRatio() == CONF_ASPECT_4_3) {
             LOG_INFO("Graphics", "Aspect Ratio: 4:3");
-        } else {
+        } 
+        else {
             LOG_INFO("Graphics", "Aspect Ratio: Unknown");
         }
 
@@ -95,12 +118,12 @@ namespace FinEngine {
         GX_AbortFrame();
     }
 
-    void Graphics_GX::TestDraw(float r, float g, float b) {
-        // Clear color set for the EFB copy; alpha 0xFF for opaque
-        GX_SetCopyClear((GXColor){ (u8)(r * 255), (u8)(g * 255), (u8)(b * 255), 0xFF }, GX_MAX_Z24);
+    
+    void Graphics_GX::BeginFrame() {
+
     }
 
-    void Graphics_GX::DrawDone() {
+    void Graphics_GX::EndFrame() {
         GX_DrawDone();
 
         System_Wii::currentXfb ^= 1;
@@ -116,6 +139,10 @@ namespace FinEngine {
         VIDEO_SetNextFramebuffer(System_Wii::xfb[System_Wii::currentXfb]);
         VIDEO_Flush();
         VIDEO_WaitVSync();
+    }
+
+    void Graphics_GX::ClearScreen() {
+        
     }
 
 }
