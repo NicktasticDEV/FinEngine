@@ -70,7 +70,6 @@ namespace FinEngine {
         // ========================================
         // Matrices
         // ========================================
-
         // Projection
         if (CONF_GetAspectRatio() == CONF_ASPECT_16_9) {
             guOrtho(perspective, 0.0f, 480, 0.0f, 854, 0.0f, 1000.0f);
@@ -142,7 +141,7 @@ namespace FinEngine {
     }
 
     void Graphics_GX::ClearScreen() {
-        
+        GX_SetCopyClear((GXColor){ 0, 0, 0, 0 }, GX_MAX_Z24);
     }
 
 }

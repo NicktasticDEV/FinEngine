@@ -3,6 +3,7 @@
 #include "FinEngine/Log.h"
 #include "FinEngine/Platform/System/System.h"
 #include "FinEngine/Platform/Graphics/Graphics.h"
+#include "FinEngine/Rendering/Renderer2D.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -47,6 +48,9 @@ namespace FinEngine {
 
         system_->Init();
         graphics_->Init();
+
+        Renderer2D::Init(graphics_.get());
+
         LOG_INFO("FinGame", "Game Initialized");
     }
 
@@ -87,7 +91,6 @@ namespace FinEngine {
 
             currentState->update();
             currentState->draw();
-            graphics_->EndFrame();
         }
     }
 
@@ -98,6 +101,8 @@ namespace FinEngine {
             delete currentState;
             currentState = nullptr;
         }
+
+        Renderer2D::Shutdown();
 
         graphics_->Shutdown();
         system_->Shutdown();

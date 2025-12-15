@@ -9,11 +9,10 @@ namespace FinEngine {
             void Init() override;
             void Shutdown() override;
 
-
             void BeginFrame() override;
             void EndFrame() override;
-            void ClearScreen() override;
 
+            void ClearScreen() override;
     };
 
 }

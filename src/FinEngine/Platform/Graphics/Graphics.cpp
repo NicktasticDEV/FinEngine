@@ -13,6 +13,7 @@ namespace FinEngine {
     
     void Graphics::BeginFrame() {}
     void Graphics::EndFrame() {}
+
     void Graphics::ClearScreen() {}
 
     Graphics* Graphics::Create() {
@@ -24,5 +25,5 @@ namespace FinEngine {
             return nullptr;
         #endif
     }
-
+    
 }

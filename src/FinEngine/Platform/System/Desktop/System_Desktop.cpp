@@ -12,9 +12,6 @@ namespace FinEngine {
 
     GLFWwindow* System_Desktop::window = nullptr;
 
-    static constexpr double targetFrameTimeMs = 1000.0 / 60.0; // Targeting 60 FPS
-    static auto lastFrameTime = std::chrono::steady_clock::now();
-
     void System_Desktop::Init() {
         LOG_INFO("System", "Initializing for Desktop Platform");
 

@@ -22,9 +22,14 @@ message(STATUS "========== Configuring FinEngine ==========")
 # ========= FinEngine ==========
 # Source files
 set(FinEngine_SRC
+    # Core
     "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Core/FinGame.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Core/FinState.cpp"
 
+    # Rendering
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Rendering/Renderer2D.cpp"
+
+    # Platform-agnostic
     "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Platform/System/System.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Platform/Graphics/Graphics.cpp"
 )
@@ -124,21 +129,26 @@ endif()
 # ====================================================================================
 # Dependencies
 # ====================================================================================
-
 # ========== Desktop Dependencies ==========
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows" OR CMAKE_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     find_package(OpenGL REQUIRED)
     add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/glfw")
+    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/glad")
+    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/stb_image")
 
     target_link_libraries(${PROJECT_NAME}
-        glfw
-        OpenGL::GL
+        PRIVATE
+            glfw
+            OpenGL::GL
+            Glad
+            stb_image
     )
 endif()
 
 # ========== Wii Dependencies ==========
 if (CMAKE_SYSTEM_NAME STREQUAL "NintendoWii")
     include("${DEVKITPRO}/cmake/Wii.cmake")
+    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/external/stb_image")
     # Include and lib paths for devkitPro
     target_include_directories(${PROJECT_NAME} PRIVATE
         "$ENV{DEVKITPRO}/libogc/include"
@@ -160,6 +170,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "NintendoWii")
             audiogc
             wiiuse
             aesnd
+            stb_image
     )
 endif()
 # ====================================================================================
@@ -170,12 +181,28 @@ endif()
 # ====================================================================================
 # Installation
 # ====================================================================================
-install(TARGETS ${PROJECT_NAME}
-    EXPORT FinEngineTargets
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-)
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows" OR CMAKE_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    install(TARGETS ${PROJECT_NAME} 
+        # TODO: Find a way so that we don't have to add some libraries here kinda like GLFW
+        Glad
+        stb_image
+
+        EXPORT FinEngineTargets
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+    )
+else()
+    install(TARGETS ${PROJECT_NAME} 
+        # TODO: Find a way so that we don't have to add some libraries here kinda like GLFW
+        stb_image
+
+        EXPORT FinEngineTargets
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+    )
+endif()
 
 install(DIRECTORY include/ DESTINATION include)
 install(EXPORT FinEngineTargets

@@ -11,6 +11,7 @@ namespace FinEngine {
 
             void BeginFrame() override;
             void EndFrame() override;
+            
             void ClearScreen() override;
     };
 

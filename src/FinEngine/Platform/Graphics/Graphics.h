@@ -11,6 +11,7 @@ namespace FinEngine {
             
             virtual void BeginFrame();
             virtual void EndFrame();
+            
             virtual void ClearScreen();
 
             static Graphics* Create();
