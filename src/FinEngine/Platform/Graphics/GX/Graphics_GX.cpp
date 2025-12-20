@@ -1,6 +1,8 @@
 #include "Graphics_GX.h"
 
 #include "FinEngine/Platform/System/Wii/System_Wii.h"
+#include "FinEngine/Platform/Windowing/Wii/Windowing_Wii.h"
+
 #include "FinEngine/Log.h"
 
 #include <gccore.h>
@@ -12,8 +14,7 @@ namespace FinEngine {
 
     void Graphics_GX::Init() {
         LOG_INFO("Graphics", "Initializing with GX backend");
-
-        Mtx GXmodelView2D;
+        
         Mtx44 perspective;
 
         // ========================================
@@ -23,8 +24,8 @@ namespace FinEngine {
         GX_Init(fifo, DEFAULT_FIFO_SIZE);
         GX_SetCopyClear((GXColor){ 0, 0, 0, 0 }, GX_MAX_Z24);
 
-        u16 fbw = System_Wii::rmode->fbWidth;
-        u16 efbh = System_Wii::rmode->efbHeight;
+        u16 fbw = Windowing_Wii::rmode->fbWidth;
+        u16 efbh = Windowing_Wii::rmode->efbHeight;
 
         GX_SetViewport(0.0f, 0.0f, (f32)fbw, (f32)efbh, 0.0f, 1.0f);
         GX_SetScissor(0, 0, fbw, efbh);
@@ -32,10 +33,10 @@ namespace FinEngine {
         GX_SetDispCopySrc(0, 0, fbw, efbh);
         GX_SetDispCopyDst(fbw, efbh);
 
-        GX_SetCopyFilter(System_Wii::rmode->aa, System_Wii::rmode->sample_pattern, GX_TRUE, System_Wii::rmode->vfilter);
-        GX_SetFieldMode(System_Wii::rmode->field_rendering, (System_Wii::rmode->viHeight == 2 * System_Wii::rmode->xfbHeight) ? GX_ENABLE : GX_DISABLE);
+        GX_SetCopyFilter(Windowing_Wii::rmode->aa, Windowing_Wii::rmode->sample_pattern, GX_TRUE, Windowing_Wii::rmode->vfilter);
+        GX_SetFieldMode(Windowing_Wii::rmode->field_rendering, (Windowing_Wii::rmode->viHeight == 2 * Windowing_Wii::rmode->xfbHeight) ? GX_ENABLE : GX_DISABLE);
 
-        if (System_Wii::rmode->aa) {
+        if (Windowing_Wii::rmode->aa) {
             GX_SetPixelFmt(GX_PF_RGB565_Z16, GX_ZC_LINEAR);
         } else {
             GX_SetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);
@@ -43,6 +44,27 @@ namespace FinEngine {
         GX_SetCullMode(GX_CULL_NONE);
         GX_SetDispCopyGamma(GX_GM_1_0);
 
+        // ========================================
+        // Matrices
+        // ========================================
+        // Projection
+        if (CONF_GetAspectRatio() == CONF_ASPECT_16_9) {
+            guOrtho(perspective, 0.0f, 480, 0.0f, 854, 0.0f, 1000.0f);
+        } 
+        else {
+            guOrtho(perspective, 0.0f, Windowing_Wii::rmode->efbHeight, 0.0f, Windowing_Wii::rmode->fbWidth, 0.0f, 1000.0f);
+        }
+        GX_LoadProjectionMtx(perspective, GX_ORTHOGRAPHIC);
+
+        // ========================================
+        // Other shit
+        // ========================================
+        GX_SetColorUpdate(GX_ENABLE);
+        GX_SetAlphaUpdate(GX_TRUE);
+        GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+
+        // TODO: This stuff should probably be handled on a per geometry basis
+        /*
         // ========================================
         // Vertex data things
         // ========================================
@@ -66,47 +88,7 @@ namespace FinEngine {
 
         GX_SetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
         GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-
-        // ========================================
-        // Matrices
-        // ========================================
-        // Projection
-        if (CONF_GetAspectRatio() == CONF_ASPECT_16_9) {
-            guOrtho(perspective, 0.0f, 480, 0.0f, 854, 0.0f, 1000.0f);
-        } 
-        else {
-            guOrtho(perspective, 0.0f, System_Wii::rmode->efbHeight, 0.0f, System_Wii::rmode->fbWidth, 0.0f, 1000.0f);
-        }
-        GX_LoadProjectionMtx(perspective, GX_ORTHOGRAPHIC);
-
-        // Model
-        guMtxIdentity(GXmodelView2D);
-        guMtxTransApply(GXmodelView2D, GXmodelView2D, 0.0f, 0.0f, -100.0f);
-        GX_LoadPosMtxImm(GXmodelView2D, GX_PNMTX0);
-
-        // ========================================
-        // Other shit
-        // ========================================
-        GX_SetColorUpdate(GX_ENABLE);
-        GX_SetAlphaUpdate(GX_TRUE);
-        GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
-        /*
-        GX_SetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
-        GX_SetAlphaCompare(GX_GREATER, 0, GX_AOP_AND, GX_ALWAYS, 0);
-        GX_SetCullMode(GX_CULL_NONE);
         */
-
-        LOG_INFO("Graphics", "Width: " + std::to_string(fbw) + ", height: " + std::to_string(efbh));
-
-        if (CONF_GetAspectRatio() == CONF_ASPECT_16_9) {
-            LOG_INFO("Graphics", "Aspect Ratio: 16:9");
-        } 
-        else if (CONF_GetAspectRatio() == CONF_ASPECT_4_3) {
-            LOG_INFO("Graphics", "Aspect Ratio: 4:3");
-        } 
-        else {
-            LOG_INFO("Graphics", "Aspect Ratio: Unknown");
-        }
 
         LOG_INFO("Graphics", "Graphics successfully initialized");
     }
@@ -125,19 +107,14 @@ namespace FinEngine {
     void Graphics_GX::EndFrame() {
         GX_DrawDone();
 
-        System_Wii::currentXfb ^= 1;
+        Windowing_Wii::currentXfb ^= 1;
 
         GX_SetColorUpdate(GX_TRUE);
         GX_SetAlphaUpdate(GX_TRUE);
 
         // Copy the EFB to the currently selected XFB
-        GX_CopyDisp(System_Wii::xfb[System_Wii::currentXfb], GX_TRUE);
+        GX_CopyDisp(Windowing_Wii::xfb[Windowing_Wii::currentXfb], GX_TRUE);
         GX_DrawDone();
-
-        // Tell VI to display that XFB *now*
-        VIDEO_SetNextFramebuffer(System_Wii::xfb[System_Wii::currentXfb]);
-        VIDEO_Flush();
-        VIDEO_WaitVSync();
     }
 
     void Graphics_GX::ClearScreen() {

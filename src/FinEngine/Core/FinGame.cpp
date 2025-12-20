@@ -1,13 +1,12 @@
 #include "FinEngine/Core/FinGame.h"
 
-#include "FinEngine/Log.h"
 #include "FinEngine/Platform/System/System.h"
+#include "FinEngine/Platform/Windowing/Windowing.h"
 #include "FinEngine/Platform/Graphics/Graphics.h"
-#include "FinEngine/Rendering/Renderer2D.h"
+#include "FinEngine/Log.h"
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <memory>
 #include <cmath>
 #include <chrono>
 #include <thread>
@@ -44,19 +43,18 @@ namespace FinEngine {
 
     void FinGame::Initialize() {
         system_.reset(System::Create());
+        windowing_.reset(Windowing::Create());
         graphics_.reset(Graphics::Create());
 
         system_->Init();
+        windowing_->Init();
         graphics_->Init();
-
-        Renderer2D::Init(graphics_.get());
 
         LOG_INFO("FinGame", "Game Initialized");
     }
 
     void FinGame::GameLoop() {
         while (isRunning) {
-            system_->Update();
 
             // State init
             if (nextState)
@@ -102,9 +100,8 @@ namespace FinEngine {
             currentState = nullptr;
         }
 
-        Renderer2D::Shutdown();
-
         graphics_->Shutdown();
+        windowing_->Shutdown();
         system_->Shutdown();
         LOG_INFO("FinGame", "Shutdown complete");
     }

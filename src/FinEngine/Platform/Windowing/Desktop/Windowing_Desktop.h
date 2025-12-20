@@ -1,13 +1,16 @@
 #pragma once
-#include "../System.h"
+#include "../Windowing.h"
 #include <GLFW/glfw3.h>
 
 namespace FinEngine {
 
-    class System_Desktop : public System {
+    class Windowing_Desktop : public Windowing {
         public:
             void Init() override;
             void Shutdown() override;
+            void Update() override;
+
+            GLFWwindow* window;
     };
 
 }

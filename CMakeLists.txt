@@ -26,12 +26,10 @@ set(FinEngine_SRC
     "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Core/FinGame.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Core/FinState.cpp"
 
-    # Rendering
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Rendering/Renderer2D.cpp"
-
     # Platform-agnostic
     "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Platform/System/System.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Platform/Graphics/Graphics.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Platform/Windowing/Windowing.cpp"
 )
 # Header files
 set(FinEngine_INCLUDE
@@ -45,6 +43,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "NintendoWii")
     list(APPEND FinEngine_SRC
         "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Platform/System/Wii/System_Wii.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Platform/Graphics/GX/Graphics_GX.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Platform/Windowing/Wii/Windowing_Wii.cpp"
     )
 
 # Desktop Platforms
@@ -52,6 +51,7 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows" OR CMAKE_SYSTEM_NAME STREQUAL "Linux
     list(APPEND FinEngine_SRC
         "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Platform/System/Desktop/System_Desktop.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Platform/Graphics/GL/Graphics_GL.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Platform/Windowing/Desktop/Windowing_Desktop.cpp"
     )
 endif()
 # ====================================================================================

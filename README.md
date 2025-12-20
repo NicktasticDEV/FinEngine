@@ -1,11 +1,10 @@
-# Fin-Engine
-A game engine for GameCube/Wii
-
-<br>
+# FinEngine
+A game engine for the Nintendo Wii
 
 # About
-Fin-Engine is a game engine inspired by <a href="https://haxeflixel.com">HaxeFlixel.</a> Fin-Engine is the game engine for the Nintendo Gamecube/Wii platform.
+FinEngine is a game engine inspired by <a href="https://haxeflixel.com">HaxeFlixel</a>.
 
----
+# This project is in early development
 
-That's all, I'm still working on the game engine!
+FinEngine is still in early development, so like it's not ready for production use at all...
+<br> Let me know if you have any questions!

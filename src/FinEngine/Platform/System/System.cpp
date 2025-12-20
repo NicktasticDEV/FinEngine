@@ -9,7 +9,6 @@
 namespace FinEngine {
 
     void System::Init() {}
-    void System::Update() {}
     void System::Shutdown() {}
 
     System* System::Create() {
