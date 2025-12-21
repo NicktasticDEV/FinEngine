@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Graphics.h"
+#include "FinEngine/Platform/Graphics.h"
 
 namespace FinEngine {
 
@@ -12,7 +12,7 @@ namespace FinEngine {
             void BeginFrame() override;
             void EndFrame() override;
             
-            void ClearScreen() override;
+            void ClearScreen(float r, float g, float b, float a) override;
     };
 
 }

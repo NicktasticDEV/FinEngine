@@ -1,4 +1,4 @@
-#include "Windowing.h"
+#include "FinEngine/Platform/Windowing.h"
 
 #if defined(FINENGINE_PLATFORM_WII)
     #include "Wii/Windowing_Wii.h"

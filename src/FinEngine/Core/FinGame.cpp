@@ -1,8 +1,5 @@
 #include "FinEngine/Core/FinGame.h"
 
-#include "FinEngine/Platform/System/System.h"
-#include "FinEngine/Platform/Windowing/Windowing.h"
-#include "FinEngine/Platform/Graphics/Graphics.h"
 #include "FinEngine/Log.h"
 
 #include <stdio.h>
@@ -56,6 +53,9 @@ namespace FinEngine {
     void FinGame::GameLoop() {
         while (isRunning) {
 
+            // Begin rendering for this frame
+            graphics_->BeginFrame();
+
             // State init
             if (nextState)
             {
@@ -89,6 +89,12 @@ namespace FinEngine {
 
             currentState->update();
             currentState->draw();
+
+            // Finish rendering and present the frame
+            graphics_->EndFrame();
+
+            // Handle windowing / platform-specific buffer swaps
+            windowing_->Update();
         }
     }
 

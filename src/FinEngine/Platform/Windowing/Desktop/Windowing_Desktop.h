@@ -1,5 +1,5 @@
 #pragma once
-#include "../Windowing.h"
+#include "FinEngine/Platform/Windowing.h"
 #include <GLFW/glfw3.h>
 
 namespace FinEngine {
@@ -10,7 +10,7 @@ namespace FinEngine {
             void Shutdown() override;
             void Update() override;
 
-            GLFWwindow* window;
+            GLFWwindow* window = nullptr;
     };
 
 }

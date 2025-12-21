@@ -31,8 +31,8 @@ namespace FinEngine {
         
     }
 
-    void Graphics_GL::ClearScreen() {
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    void Graphics_GL::ClearScreen(float r, float g, float b, float a) {
+        glClearColor(r, g, b, a);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 

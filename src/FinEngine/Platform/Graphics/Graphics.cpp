@@ -1,4 +1,4 @@
-#include "Graphics.h"
+#include "FinEngine/Platform/Graphics.h"
 
 #if defined(FINENGINE_PLATFORM_WII)
     #include "GX/Graphics_GX.h"
@@ -14,7 +14,7 @@ namespace FinEngine {
     void Graphics::BeginFrame() {}
     void Graphics::EndFrame() {}
 
-    void Graphics::ClearScreen() {}
+    void Graphics::ClearScreen(float r, float g, float b, float a ) {}
 
     Graphics* Graphics::Create() {
         #if  defined(FINENGINE_PLATFORM_WII)

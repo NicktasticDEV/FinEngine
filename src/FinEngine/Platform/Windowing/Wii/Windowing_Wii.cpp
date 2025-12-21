@@ -19,8 +19,11 @@ namespace FinEngine {
 
         VIDEO_Configure(rmode);
 
+        // Clear both framebuffers to a known state (black)
+        VIDEO_ClearFrameBuffer(rmode, xfb[0], COLOR_BLACK);
+        VIDEO_ClearFrameBuffer(rmode, xfb[1], COLOR_BLACK);
+
         VIDEO_SetNextFramebuffer(xfb[currentXfb]);
-        VIDEO_ClearFrameBuffer(rmode, xfb[currentXfb], COLOR_BLACK);
 
         VIDEO_SetBlack(false);
         VIDEO_Flush();
@@ -46,8 +49,6 @@ namespace FinEngine {
     }
 
     void Windowing_Wii::Update() {
-        currentXfb ^= 1;
-
         VIDEO_SetNextFramebuffer(xfb[currentXfb]);
         VIDEO_Flush();
         VIDEO_WaitVSync();

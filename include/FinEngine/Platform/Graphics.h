@@ -12,7 +12,7 @@ namespace FinEngine {
             virtual void BeginFrame();
             virtual void EndFrame();
             
-            virtual void ClearScreen();
+            virtual void ClearScreen(float r, float g, float b, float a );
 
             static Graphics* Create();
     };

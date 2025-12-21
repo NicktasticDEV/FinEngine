@@ -1,5 +1,5 @@
 #pragma once
-#include "../System.h"
+#include "FinEngine/Platform/System.h"
 #include <GLFW/glfw3.h>
 
 namespace FinEngine {

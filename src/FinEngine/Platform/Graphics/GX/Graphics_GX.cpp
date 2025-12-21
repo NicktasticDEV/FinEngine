@@ -105,8 +105,6 @@ namespace FinEngine {
     }
 
     void Graphics_GX::EndFrame() {
-        GX_DrawDone();
-
         Windowing_Wii::currentXfb ^= 1;
 
         GX_SetColorUpdate(GX_TRUE);
@@ -117,8 +115,8 @@ namespace FinEngine {
         GX_DrawDone();
     }
 
-    void Graphics_GX::ClearScreen() {
-        GX_SetCopyClear((GXColor){ 0, 0, 0, 0 }, GX_MAX_Z24);
+    void Graphics_GX::ClearScreen(float r, float g, float b, float a) {
+        GX_SetCopyClear((GXColor){ (u8)(r * 255), (u8)(g * 255), (u8)(b * 255), (u8)(a * 255) }, GX_MAX_Z24);
     }
 
 }

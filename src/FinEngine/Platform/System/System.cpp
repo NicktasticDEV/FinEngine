@@ -1,4 +1,4 @@
-#include "System.h"
+#include "FinEngine/Platform/System.h"
 
 #if defined(FINENGINE_PLATFORM_WII)
     #include "Wii/System_Wii.h"

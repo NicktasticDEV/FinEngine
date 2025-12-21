@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Windowing.h"
+#include "FinEngine/Platform/Windowing.h"
 #include <gccore.h>
 
 namespace FinEngine {
