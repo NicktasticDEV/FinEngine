@@ -1,17 +1,21 @@
 cmake_minimum_required(VERSION 3.25)
 project(FinEngine)
-include(cmake/CPM.cmake)
+
+
+
 
 # ====================================================================================
 # Options
 # ====================================================================================
-option(FINENGINE_BUILD_EXAMPLES "Build FinEngine example projects" OFF)
+option(FINENGINE_BUILD_EXAMPLES "Build FinEngine example projects" ON)
 # ====================================================================================
+
 
 
 
 message(STATUS "")
 message(STATUS "========== Configuring FinEngine ==========")
+
 
 
 
@@ -36,7 +40,6 @@ set(FinEngine_INCLUDE
     "${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
 
-
 # ========== Platform-specific sources =========
 # Nintendo Wii
 if(CMAKE_SYSTEM_NAME STREQUAL "NintendoWii")
@@ -54,6 +57,7 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows" OR CMAKE_SYSTEM_NAME STREQUAL "Linux
         "${CMAKE_CURRENT_SOURCE_DIR}/src/FinEngine/Platform/Windowing/Desktop/Windowing_Desktop.cpp"
     )
 endif()
+
 # ====================================================================================
 
 
@@ -109,17 +113,26 @@ endif()
 # ========== Wii Platform ==========
 if (CMAKE_SYSTEM_NAME STREQUAL "NintendoWii")
     target_compile_definitions(${PROJECT_NAME}
-        PRIVATE FINENGINE_PLATFORM_WII
+        PRIVATE FINENGINE_PLATFORM_WII # Old name
+        PRIVATE FINENGINE_PLATFORM_RVL
     )
     message(STATUS "Building for: Nintendo Wii")
 endif()
 
-# ========== Debug Mode ==========
+# ========== Build Type ==========
+# Debug
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_definitions(${PROJECT_NAME}
-        PRIVATE FINENGINE_DEBUG
+        PRIVATE FINENGINE_BUILD_TYPE_DEBUG
     )
     message(STATUS "Building config: Debug")
+
+# Release
+elseif (CMAKE_BUILD_TYPE STREQUAL "Release")
+    target_compile_definitions(${PROJECT_NAME}
+        PRIVATE FINENGINE_BUILD_TYPE_RELEASE
+    )
+    message(STATUS "Building config: Relase")
 endif()
 # ====================================================================================
 
@@ -179,6 +192,18 @@ endif()
 
 
 # ====================================================================================
+# location of final artifacts (include platform and build type in path)
+# ====================================================================================
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/out/bin/${CMAKE_SYSTEM_NAME}/${CMAKE_BUILD_TYPE}"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/out/lib/${CMAKE_SYSTEM_NAME}/${CMAKE_BUILD_TYPE}"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/out/lib/${CMAKE_SYSTEM_NAME}/${CMAKE_BUILD_TYPE}"
+)
+
+
+
+
+# ====================================================================================
 # Installation
 # ====================================================================================
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows" OR CMAKE_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_SYSTEM_NAME STREQUAL "Darwin")
@@ -188,9 +213,9 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows" OR CMAKE_SYSTEM_NAME STREQUAL "Linux" O
         stb_image
 
         EXPORT FinEngineTargets
-        RUNTIME DESTINATION bin
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
+        RUNTIME DESTINATION bin/${CMAKE_SYSTEM_NAME}/${CMAKE_BUILD_TYPE}
+        LIBRARY DESTINATION lib/${CMAKE_SYSTEM_NAME}/${CMAKE_BUILD_TYPE}
+        ARCHIVE DESTINATION lib/${CMAKE_SYSTEM_NAME}/${CMAKE_BUILD_TYPE}
     )
 else()
     install(TARGETS ${PROJECT_NAME} 
@@ -198,9 +223,9 @@ else()
         stb_image
 
         EXPORT FinEngineTargets
-        RUNTIME DESTINATION bin
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
+        RUNTIME DESTINATION bin/${CMAKE_SYSTEM_NAME}/${CMAKE_BUILD_TYPE}
+        LIBRARY DESTINATION lib/${CMAKE_SYSTEM_NAME}/${CMAKE_BUILD_TYPE}
+        ARCHIVE DESTINATION lib/${CMAKE_SYSTEM_NAME}/${CMAKE_BUILD_TYPE}
     )
 endif()
 
@@ -212,17 +237,19 @@ install(EXPORT FinEngineTargets
 # ====================================================================================
 
 
+
+
 message(STATUS "========== Finished Configuring FinEngine ==========")
 message(STATUS "")
+
+
 
 
 # ====================================================================================
 # Examples
 # ====================================================================================
-#[[
 if(FINENGINE_BUILD_EXAMPLES)
     message(STATUS "Building FinEngine example projects")
     add_subdirectory(examples)
 endif()
-]]#
 # ====================================================================================
